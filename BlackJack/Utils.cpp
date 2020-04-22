@@ -167,3 +167,14 @@ void WaitForKeyPress()
 
 	//system("read -n 1 -s -p \"Press any key to continue...\";echo");
 }
+
+bool WantToPlayAgain()
+{
+	char input;
+
+	const char validInput[2] = { 'y', 'n' };
+
+	input = GetCharacter("\nWould you like to play again? (y/n): ", INPUT_ERROR_STRING, validInput, 2, CC_LOWER_CASE);
+
+	return input == 'y';
+}
