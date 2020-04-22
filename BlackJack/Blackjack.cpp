@@ -147,29 +147,34 @@ const int IGNORE_CHARS = 256;
 const char * INPUT_ERROR_STRING = "Input error! Please try again.";
 
 void ShowInstructions();
-void InitializeDealer(Deck &deck);
+void InitializeDeck(Deck &deck);
 void InitializePlayer(Player &player, const char * playerName);
 void PrintCard(const Card &card);
 void PrintDeck(const Deck &deck);
-void StartDeal(Deck &deck, Player &player, Player &dealer);
-void PlayGame(Player &player);
+//void StartDeal(Deck &deck, Player &player, Player &dealer);
+void PlayGame(Player &player, Player &dealer);
 bool IsGameOver();
+void DrawAllCards(int drawnCards[], int playerCards);
+bool WantToPlayAgain();
 
 int main()
 {
 
 	srand(time(NULL));
 
-	Player player{};
+	Player player;
+	Player dealer;
 
 	InitializePlayer(player, "Player1");
+	InitializePlayer(dealer, "Dealer");
 
 	do
 	{
-		PlayGame(player);
+		PlayGame(player, dealer);
 	} while (WantToPlayAgain());
 
 	WaitForKeyPress();
+	return 0;
 }
 
 void ShowInstructions()
@@ -206,7 +211,7 @@ void InitializePlayer(Player &player, const char * playerName)
 
 }
 
-void InitializeDealer(Deck &deck)
+void InitializeDeck(Deck &deck)
 {
 	int card{ 0 };
 	for (int i = 0; i < MAX_RANK; i++)
@@ -220,43 +225,50 @@ void InitializeDealer(Deck &deck)
 	}
 }
 
-void PlayGame()
+void PlayGame(Player &player, Player &dealer)
 {
 
 	ClearScreen();
 	ShowInstructions();
 
 	Deck deck{};
-	InitializeDealer(deck);
+	InitializeDeck(deck);
 	PrintDeck(deck);
 
-	int drawnCards[MAX_PLAYER_CARDS]{ 0 };
-	do
-	{
+	
+	int drawnCards[MAX_PLAYER_CARDS];
+	DrawAllCards(drawnCards, MAX_PLAYER_CARDS);
 
-	} while (!IsGameOver());
-}
-
-int* DrawCards()
-{
-	int drawnCards[MAX_PLAYER_CARDS]{ 0 };
 	for (int i = 0; i < MAX_PLAYER_CARDS; i++)
 	{
-		drawnCards[i] = -1; // initialize all elements to -1.
+		cout<< drawnCards[i] << endl;
 	}
 
-	do
-	{
-	drawnCards[i] = rand() % MAX_PLAYER_CARDS
-	}
-	while(!IsValidDraw)
-	for (int i = 0; i < 4; i++)
-	{
-		player.playerCards[i] = rand() % BOARD_SIZE
-	}
+}
 
-	guess.row = rand() % BOARD_SIZE;
-	guess.col = rand() % BOARD_SIZE;
+int DrawCard()
+{
+	return rand() % TOTAL_CARDS;
+
+}
+
+void DrawAllCards(int drawnCards[], int playerCards )
+{
+	int i = 0;
+	while (i < playerCards)
+	{
+		int newCard{ 0 };
+		newCard = DrawCard();
+		if (drawnCards[i] == newCard)
+		{
+			drawnCards[i] = 0;
+		}
+		else
+		{
+			drawnCards[i] = newCard;
+			i++;
+		}
+	}
 }
 
 bool IsGameOver()
@@ -338,4 +350,15 @@ void PrintCard(const Card &card)
 		std::cout << "_" << '?' << " ";
 		break;
 	}
+}
+
+bool WantToPlayAgain()
+{
+	char input;
+
+	const char validInput[2] = { 'y', 'n' };
+
+	input = GetCharacter("\nWould you like to play again? (y/n): ", INPUT_ERROR_STRING, validInput, 2, CC_LOWER_CASE);
+
+	return input == 'y';
 }
