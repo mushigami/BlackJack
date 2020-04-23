@@ -204,7 +204,7 @@ void InitializePlayer(Player &player, const char * playerName)
 {
 	if (playerName != nullptr && strlen(playerName) > 0)
 	{
-		strcpy_s(player.playerName, playerName);
+		strcpy(player.playerName, playerName);
 	}
 	player.hasBlackJack = false;
 	player.hasWon = false;
@@ -235,7 +235,6 @@ void PlayGame(Player &player, Player &dealer)
 	InitializeDeck(deck);
 	PrintDeck(deck);
 
-	
 	int drawnCards[MAX_PLAYER_CARDS];
 	DrawAllCards(drawnCards, MAX_PLAYER_CARDS);
 
@@ -243,6 +242,16 @@ void PlayGame(Player &player, Player &dealer)
 	{
 		cout<< drawnCards[i] << endl;
 	}
+	char hitOrStand{};
+	
+	do{
+		DealCards()
+		//ShowTable();
+		hitOrStand = AskHitOrStand();
+
+	}while(!IsGameOver());
+	
+	DisplayResult();
 
 }
 
@@ -282,6 +291,13 @@ void PrintDeck(const Deck &deck)
 	{
 			PrintCard(deck.totalCards[i]);
 	}
+}
+
+char AskHitOrStand()
+{
+	const char validInput[2] = { 'h', 's' };
+	
+	return GetCharacter("Do you [H]it or [S]tand? ", "Wrong input. Please press [H] or [S]! ", validInput, 2 , CC_LOWER_CASE);
 }
 
 void PrintCard(const Card &card)
