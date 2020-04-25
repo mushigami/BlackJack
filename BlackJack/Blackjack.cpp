@@ -97,6 +97,7 @@ enum
 };
 enum CardRank
 {
+	RANK_UNDEFINED=0,
 	RANK_2,
 	RANK_3,
 	RANK_4,
@@ -111,10 +112,12 @@ enum CardRank
 	RANK_KING,
 	RANK_ACE,
 	MAX_RANK,
+	
 };
 
 enum CardSuit
 {
+	SUIT_UNDEFINED=0,
 	SUIT_CLUB,
 	SUIT_DIAMOND,
 	SUIT_SPADE,
@@ -143,6 +146,12 @@ struct Player
 	bool hasWon{ false };
 };
 
+bool operator==(const Card &card1, const Card &card2)
+{
+	return(card1.rank == card2.rank && card1.suit == card2.suit);
+}
+
+
 const int IGNORE_CHARS = 256;
 const char * INPUT_ERROR_STRING = "Input error! Please try again.";
 
@@ -154,8 +163,12 @@ void PrintDeck(const Deck &deck);
 //void StartDeal(Deck &deck, Player &player, Player &dealer);
 void PlayGame(Player &player, Player &dealer);
 bool IsGameOver();
-void DrawAllCards(int drawnCards[], int playerCards);
+char AskHitOrStand();
+void DrawAllCards(Card drawnCards[], int playerCards);
+void DealCards(Player &player, Player &dealer, Card drawnCards[], int numberOfDrawnCards);
 bool WantToPlayAgain();
+void DisplayResult();
+
 
 int main()
 {
@@ -214,9 +227,9 @@ void InitializePlayer(Player &player, const char * playerName)
 void InitializeDeck(Deck &deck)
 {
 	int card{ 0 };
-	for (int i = 0; i < MAX_RANK; i++)
+	for (int i = 1; i < MAX_RANK; i++)
 	{
-		for (int j = 0;j < MAX_SUIT; j++)
+		for (int j = 1;j < MAX_SUIT; j++)
 		{
 			deck.totalCards[card].rank = static_cast<CardRank>(i);
 			deck.totalCards[card].suit = static_cast<CardSuit>(j);
@@ -233,19 +246,19 @@ void PlayGame(Player &player, Player &dealer)
 
 	Deck deck{};
 	InitializeDeck(deck);
-	PrintDeck(deck);
+	//PrintDeck(deck);
 
-	int drawnCards[MAX_PLAYER_CARDS];
+	Card drawnCards[MAX_PLAYER_CARDS];
 	DrawAllCards(drawnCards, MAX_PLAYER_CARDS);
 
 	for (int i = 0; i < MAX_PLAYER_CARDS; i++)
 	{
-		cout<< drawnCards[i] << endl;
+		PrintCard(drawnCards[i]);
 	}
 	char hitOrStand{};
+	DealCards(player, dealer, drawnCards, MAX_PLAYER_CARDS);
 	
 	do{
-		DealCards()
 		//ShowTable();
 		hitOrStand = AskHitOrStand();
 
@@ -255,22 +268,27 @@ void PlayGame(Player &player, Player &dealer)
 
 }
 
-int DrawCard()
+Card DrawCard()
 {
-	return rand() % TOTAL_CARDS;
+	Card newCard;
+	newCard.rank = static_cast<CardRank>(rand() % (MAX_RANK-1) + 1);
+	newCard.suit = static_cast<CardSuit>(rand() % (MAX_SUIT-1) + 1);
+	
+	return newCard;
 
 }
 
-void DrawAllCards(int drawnCards[], int playerCards )
+void DrawAllCards(Card drawnCards[], int numberOfDrawnCards )
 {
 	int i = 0;
-	while (i < playerCards)
+	while (i < numberOfDrawnCards)
 	{
-		int newCard{ 0 };
+		Card newCard;
 		newCard = DrawCard();
 		if (drawnCards[i] == newCard)
 		{
-			drawnCards[i] = 0;
+			drawnCards[i].rank = RANK_UNDEFINED;
+			drawnCards[i].suit = SUIT_UNDEFINED;
 		}
 		else
 		{
@@ -280,6 +298,16 @@ void DrawAllCards(int drawnCards[], int playerCards )
 	}
 }
 
+void DealCards(Player &player, Player &dealer, Card drawnCards[], int numberOfDrawnCards)
+{
+	// To deal firs two cards of the player and the dealer
+	int i = 0;
+	player.playerCards[i] = drawnCards[i];
+	dealer.playerCards[i] = drawnCards[i+1];
+	player.playerCards[i+1] = drawnCards[i+2];
+	dealer.playerCards[i+1] = drawnCards[i+3];
+	
+}
 bool IsGameOver()
 {
 	return true;
@@ -343,6 +371,9 @@ void PrintCard(const Card &card)
 	case CardRank::RANK_ACE:
 		std::cout << 'A';
 		break;
+	case CardRank::MAX_RANK:
+		std::cout <<"MAX";
+		break;
 	default:
 		std::cout << '?';
 		break;
@@ -362,6 +393,9 @@ void PrintCard(const Card &card)
 	case CardSuit::SUIT_SPADE:
 		std::cout << "_" << 'S' << " ";
 		break;
+	case CardSuit::MAX_SUIT:
+		std::cout <<"MAX";
+		break;
 	default:
 		std::cout << "_" << '?' << " ";
 		break;
@@ -377,4 +411,9 @@ bool WantToPlayAgain()
 	input = GetCharacter("\nWould you like to play again? (y/n): ", INPUT_ERROR_STRING, validInput, 2, CC_LOWER_CASE);
 
 	return input == 'y';
+}
+
+void DisplayResult()
+{
+	cout << "Result"<<endl;
 }
